@@ -67,5 +67,5 @@ jobs:
           NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }} # token expires March 13, 2025. update to OIDC before then
 
       - name: Push changes
-        run: git push origin HEAD
+        run: git push
         if: steps.detect.outputs.latest_commit != steps.detect.outputs.current_commit && steps.detect.outputs.latest_tag != ''
