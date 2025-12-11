@@ -1,3 +1,4 @@
 dist
+emsdk
 src/pkg
 node_modules

@@ -1,0 +1,70 @@
+name: Update rcheevos
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # 06:00 UTC every day
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: rcheevos-release-check
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Emscripten
+        uses: numworks/setup-emscripten@latest
+
+      - name: Configure git
+        uses: qoomon/actions--setup-git@v1.1.1
+
+      - name: Detect latest rcheevos tag
+        id: detect
+        run: .github/scripts/find-rcheevos-release.sh
+
+      - name: Stop if already up to date
+        if: steps.detect.outputs.latest_commit == steps.detect.outputs.current_commit || steps.detect.outputs.latest_tag == ''
+        run: echo "rcheevos is already up to date."
+
+      - name: Update submodule to latest tag
+        if: steps.detect.outputs.latest_commit != steps.detect.outputs.current_commit && steps.detect.outputs.latest_tag != ''
+        run: .github/scripts/update-rcheevos-submodule.sh "${{ steps.detect.outputs.latest_tag }}"
+
+      - name: Install dependencies
+        if: steps.detect.outputs.latest_commit != steps.detect.outputs.current_commit && steps.detect.outputs.latest_tag != ''
+        run: bun install --frozen-lockfile
+
+      - name: Build package
+        if: steps.detect.outputs.latest_commit != steps.detect.outputs.current_commit && steps.detect.outputs.latest_tag != ''
+        run: bun run build
+
+      - name: Bump package version
+        if: steps.detect.outputs.latest_commit != steps.detect.outputs.current_commit && steps.detect.outputs.latest_tag != ''
+        run: bunx npm version patch -f
+
+      - name: Publish package
+        if: steps.detect.outputs.latest_commit != steps.detect.outputs.current_commit && steps.detect.outputs.latest_tag != ''
+        run: bun publish
+        env:
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }} # token expires March 13, 2025. update to OIDC before then
+
+      - name: Push changes
+        if: steps.detect.outputs.latest_commit != steps.detect.outputs.current_commit && steps.detect.outputs.latest_tag != ''
+        run: git push origin HEAD
