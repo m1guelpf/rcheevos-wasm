@@ -1,6 +1,6 @@
 {
 	"name": "rcheevos",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"author": "Miguel Piedrafita <npm@miguel.build>",
 	"license": "MIT",
 	"homepage": "https://github.com/m1guelpf/rcheevos-wasm",
