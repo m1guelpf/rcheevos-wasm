@@ -3,7 +3,7 @@
 	"version": "0.1.1",
 	"author": "Miguel Piedrafita <npm@miguel.build>",
 	"license": "MIT",
-	"homepage": "https://github.com/m1guelpf/rcheevos-wasm",
+	"homepage": "https://github.com/RetroAchievements/rcheevos-wasm",
 	"description": "Generate ROM hashes using a WASM build of rcheevos",
 	"sideEffects": false,
 	"type": "module",
@@ -37,7 +37,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/m1guelpf/rcheevos-wasm.git"
+		"url": "git+https://github.com/RetroAchievements/rcheevos-wasm.git"
 	},
 	"keywords": [
 		"wasm",
